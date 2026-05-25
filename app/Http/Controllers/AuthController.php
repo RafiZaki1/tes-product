@@ -59,7 +59,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Logout berhasil'
+            'message' => 'Logout telah berhasil, silahkan login lagi'
         ]);
     }
 }

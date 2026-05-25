@@ -14,10 +14,17 @@ class ProductController extends Controller
     {
         $this->productHandler = $productHandler;
     }
-
-    public function index()
+public function index()
     {
         $products = $this->productHandler->getAllProducts();
+
+        if ($products->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Admin belum mengisi products. Silahkan menunggu beberapa saat lagi',
+                'data'    => []
+            ], 200);
+        }
 
         return response()->json([
             'success' => true,
@@ -25,7 +32,7 @@ class ProductController extends Controller
             'data'    => $products
         ], 200);
     }
-
+    
     public function store(ProductRequest $request)
     {
         $dataBersih = $request->validated();

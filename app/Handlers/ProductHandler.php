@@ -3,14 +3,19 @@
 namespace App\Handlers;
 
 use App\Repositories\ProductRepositoryInterface;
+use App\Repositories\OrderRepositoryInterface; 
 
 class ProductHandler
 {
     protected $productRepo;
+    protected $orderRepo;
 
-    public function __construct(ProductRepositoryInterface $productRepo)
-    {
+    public function __construct(
+        ProductRepositoryInterface $productRepo,
+        OrderRepositoryInterface $orderRepo
+    ) {
         $this->productRepo = $productRepo;
+        $this->orderRepo = $orderRepo;
     }
 
     public function getAllProducts()
@@ -36,5 +41,23 @@ class ProductHandler
     public function deleteProduct($id)
     {
         return $this->productRepo->delete($id);
+    }
+
+    public function buyProduct($productId, $quantity, $userId)
+    {
+        $product = $this->productRepo->getById($productId);
+
+        if (!$product) {
+            throw new \Exception("Produk tidak ditemukan.");
+        }
+
+        if ($product->stock === 0) {
+            throw new \Exception("Maaf, produk '" . $product->name . "' sudah habis terjual.");
+        }
+
+        if ($quantity > $product->stock) {
+            throw new \Exception("Stok tidak mencukupi. Sisa stok tersedia: " . $product->stock . " pcs.");
+        }
+        return $this->orderRepo->executePurchase($productId, $quantity, $userId);
     }
 }

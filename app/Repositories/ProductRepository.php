@@ -1,15 +1,21 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Models\Product;
+use Illuminate\Support\Facades\Cache;
 use Override;
 
 class ProductRepository implements ProductRepositoryInterface
 {
- 
+    protected $cacheKey = 'product_all';
+
     public function getAll()
     {
-        return Product::all();
+
+        return Cache::remember($this->cacheKey, 3600, function () {
+            return Product::all();
+        });
     }
 
     #[Override]
@@ -21,11 +27,15 @@ class ProductRepository implements ProductRepositoryInterface
     #[Override]
     public function create(array $data)
     {
-        return Product::create([
+        $product = Product::create([
             'name' => $data['name'],
             'price' => $data['price'],
             'stock' => $data['stock'],
         ]);
+
+        Cache::forget($this->cacheKey);
+
+        return $product;
     }
 
     #[Override]
@@ -36,6 +46,9 @@ class ProductRepository implements ProductRepositoryInterface
             return null;
         }
         $product->update($data);
+
+        Cache::forget($this->cacheKey);
+
         return $product;
     }
 
@@ -46,6 +59,13 @@ class ProductRepository implements ProductRepositoryInterface
         if (!$product) {
             return false;
         }
-        return $product->delete();
+        
+        $deleted = $product->delete();
+
+        if ($deleted) {
+            Cache::forget($this->cacheKey);
+        }
+
+        return $deleted;
     }
 }
