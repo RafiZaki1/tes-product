@@ -18,7 +18,7 @@ class OrderController extends Controller
     public function store(OrderRequest $request)
     {
         $data = $request->validated();
-        $userId = $request->user()->id; // Mengambil ID user yang sedang login
+        $userId = $request->user()->id; 
 
         try {
             $receipt = $this->productHandler->buyProduct($data['product_id'], $data['quantity'], $userId);

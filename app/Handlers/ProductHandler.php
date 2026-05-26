@@ -10,7 +10,7 @@ class ProductHandler
     protected $productRepo;
     protected $orderRepo;
 
-    public function __construct(
+    public function construct(
         ProductRepositoryInterface $productRepo,
         OrderRepositoryInterface $orderRepo
     ) {

@@ -3,10 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\ProductRepository;
-use App\Repositories\ProductRepositoryInterface;
-use App\Repositories\OrderRepositoryInterface;
-use App\Repositories\OrderRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,13 +11,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
+        $modules = [
+            'Product',
+            'Order',
+        ];
 
-        $this->app->bind(OrderRepositoryInterface::class, OrderRepository::class);
+        foreach ($modules as $module) {
+            $this->app->bind(
+                "App\Repositories\\{$module}\\{$module}RepositoryInterface",
+                "App\Repositories\\{$module}\\{$module}Repository"
+            );
+        }
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void {}
 }
